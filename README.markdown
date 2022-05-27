@@ -33,11 +33,7 @@ You can use blocks too, just like CanCan:
     before do
       user = User.find_by_id(session[:user_id])
 
-      if user.is_admin?
-        can :kick, User do |victim|
-          !victim.is_admin?
-        end
-      end
+      can :kick, User { |victim| !victim.is_admin? } if user.is_admin?
     end
 
 The possibility to use a Rails' CanCan class was dropped from this gem.
@@ -75,7 +71,7 @@ If the user isn't authorized, your app will return a RESTful 403 error, but you 
 
 Or directly in the authorize! command itself:
 
-    authorize! :admin, :all, :not_auth => '/login'
+    authorize! :admin, :all, not_auth: '/login'
 
 Sinatra lacks controllers, but you can use "before" blocks to restrict groups of routes with wildcards (or even regular expressions). In this case you'll only be able to access the pages under /customers/ if your user is authorized to ":manage" some "Customers".
 
@@ -99,7 +95,7 @@ This condition works with all the other helpers, and provide you with even more 
 
 There is a built-in condition called :can that can be used in your blocks. It returns 403 when the user has no access. It basically replaces the authorize! method.
 
-    get '/admin', :can => [ :admin, :all ] do
+    get '/admin', can: [ :admin, :all ] do
       haml :admin
     end
 
@@ -122,13 +118,13 @@ Here's the syntax:
 
 There's also a handy condition:
 
-    get '/projects/:id', :model => Project do
+    get '/projects/:id', model: Project do
       @project.name
     end
 
 You can load collections too, with both syntaxes. Just use a `get` handler, without an `:id` property:
 
-    get '/projects', :model => Project do
+    get '/projects', model: Project do
       # here are your projects
       @project
     end
@@ -159,7 +155,7 @@ So, for a model called Projects, you can define your abilities like this, for ex
 
 DataMapper Models are problematic when used with Sinatra conditions, since DataMapper turns the class constant into a method, and Sinatra evaluates every parameter. So, when using it with the :model condition, wrap it with brackets:
 
-    get '/users', :model => [ Users ] do
+    get '/users', model: [ Users ] do
       # etc
     end
 
